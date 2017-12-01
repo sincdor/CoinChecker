@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "684194151146",
+    "firebase_url": "https://coinchecker-aafcb.firebaseio.com",
+    "project_id": "coinchecker-aafcb",
+    "storage_bucket": "coinchecker-aafcb.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:684194151146:android:799178879517a044",
+        "android_client_info": {
+          "package_name": "virtual_coin_checker.sincdor.coinchecker"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "684194151146-1smgikdteulqjcog6f84mpa41h4762jd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "virtual_coin_checker.sincdor.coinchecker",
+            "certificate_hash": "c82c8f03fa9566b4f14570d9d9f09d91805c1e5c"
+          }
+        },
+        {
+          "client_id": "684194151146-bsgsgm6imijort4ropjhdoftra35l1qs.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAJmWbg7EXVM3U4YhpLDHgydoZ43TkCel0"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "684194151146-bsgsgm6imijort4ropjhdoftra35l1qs.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
