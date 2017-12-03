@@ -47,6 +47,8 @@ public class MainActivity extends AppCompatActivity {
 
     SearchView sv;
 
+    ArrayList<String> coins;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +58,11 @@ public class MainActivity extends AppCompatActivity {
         FirebaseMessaging.getInstance().subscribeToTopic("vertcoin");
         FirebaseMessaging.getInstance().subscribeToTopic("bitcoin");
 
+        coins = new ArrayList<>();
+        coins.add("vertcoin");
+        coins.add("bitcoin");
+        coins.add("nxt");
+
         service = new TickerRetroS();
 
         dataSet = new ArrayList<>();
@@ -63,68 +70,7 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar_ALU);
         setSupportActionBar(toolbar);
 
-        service.getTickerCoin("vertcoin",
-                new Callback<List<Ticker>>() {
-                    @Override
-                    public void onResponse(@NonNull Call<List<Ticker>> call,
-                                           @NonNull Response<List<Ticker>> response) {
-                        Log.e(TAG, "onResponse: ");
-
-                        if(response.body() != null)
-                        {
-                            Ticker t = null;
-                            try{
-                                if(response.body().size() > 0)
-                                    t = response.body().get(0);
-                                if(t != null) {
-                                    dataSet.add(t);
-                                    adapter.notifyDataSetChanged();
-                                }
-
-                            }catch (ClassCastException e){
-                                Log.e(TAG, "onResponse: Couldn't cast");
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(@NonNull Call<List<Ticker>> call,
-                                          @NonNull Throwable t) {
-                        Log.e(TAG, "onFailure: ");
-                    }
-                });
-
-        service.getTickerCoin("bitcoin",
-                new Callback<List<Ticker>>() {
-                    @Override
-                    public void onResponse(@NonNull Call<List<Ticker>> call,
-                                           @NonNull Response<List<Ticker>> response) {
-                        Log.e(TAG, "onResponse: ");
-
-                        if(response.body() != null)
-                        {
-                            Ticker t = null;
-                            try{
-                                if(response.body().size() > 0)
-                                    t = response.body().get(0);
-                                if(t != null) {
-                                    dataSet.add(t);
-                                    adapter.notifyDataSetChanged();
-                                }
-
-                            }catch (ClassCastException e){
-                                Log.e(TAG, "onResponse: Couldn't cast");
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(@NonNull Call<List<Ticker>> call, @NonNull Throwable t) {
-                        Log.e(TAG, "onFailure: ");
-                    }
-                });
-
-        recyclerView = (RecyclerView) findViewById(R.id.id_content_main_activity_recycler_view);
+        recyclerView = findViewById(R.id.id_content_main_activity_recycler_view);
 
         mLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(mLayoutManager);
@@ -132,74 +78,46 @@ public class MainActivity extends AppCompatActivity {
         adapter = new MainActivityAdapter(dataSet, Utils.TWENTY_FOUR_HOURS_CHANGE);
         recyclerView.setAdapter(adapter);
 
+        updateView(null, coins);
+
     }
 
     private void updateView(String sHour, List<String>coins){
 
-        dataSet = new ArrayList<>();
-        if(adapter != null)
-            adapter.notifyDataSetChanged();
-        service.getTickerCoin("vertcoin",
-                new Callback<List<Ticker>>() {
-                    @Override
-                    public void onResponse(@NonNull Call<List<Ticker>> call,
-                                           @NonNull Response<List<Ticker>> response) {
-                        Log.e(TAG, "onResponse: ");
+        for(String coin : coins) {
+            service.getTickerCoin(coin,
+                    new Callback<List<Ticker>>() {
+                        @Override
+                        public void onResponse(@NonNull Call<List<Ticker>> call,
+                                               @NonNull Response<List<Ticker>> response) {
+                            if (response.body() != null) {
+                                Ticker t = null;
+                                try {
+                                    if (response.body().size() > 0)
+                                        t = response.body().get(0);
+                                    if (t != null) {
+                                        Log.d(TAG, "onResponse: Coin:" + t.getId() + " price:" + t.getPrice_usd());
+                                        dataSet.add(t);
+                                        if (adapter != null)
+                                            adapter.notifyDataSetChanged();
+                                    }
 
-                        if (response.body() != null) {
-                            Ticker t = null;
-                            try {
-                                if (response.body().size() > 0)
-                                    t = response.body().get(0);
-                                if (t != null) {
-                                    dataSet.add(t);
-                                    if(adapter != null)
-                                        adapter.notifyDataSetChanged();
+                                } catch (ClassCastException e) {
+                                    Log.e(TAG, "onResponse: Couldn't cast");
                                 }
-
-                            } catch (ClassCastException e) {
-                                Log.e(TAG, "onResponse: Couldn't cast");
+                            }else{
+                                Log.e(TAG, "onResponse: response.body() = null");
                             }
                         }
-                    }
 
-                    @Override
-                    public void onFailure(@NonNull Call<List<Ticker>> call,
-                                          @NonNull Throwable t) {
-                        Log.e(TAG, "onFailure: ");
-                    }
-                });
-
-        service.getTickerCoin("bitcoin",
-                new Callback<List<Ticker>>() {
-                    @Override
-                    public void onResponse(@NonNull Call<List<Ticker>> call,
-                                           @NonNull Response<List<Ticker>> response) {
-                        Log.e(TAG, "onResponse: ");
-
-                        if (response.body() != null) {
-                            Ticker t = null;
-                            try {
-                                if (response.body().size() > 0)
-                                    t = response.body().get(0);
-                                if (t != null) {
-                                    dataSet.add(t);
-                                    if(adapter != null)
-                                        adapter.notifyDataSetChanged();
-                                }
-
-                            } catch (ClassCastException e) {
-                                Log.e(TAG, "onResponse: Couldn't cast");
-                            }
+                        @Override
+                        public void onFailure(@NonNull Call<List<Ticker>> call,
+                                              @NonNull Throwable t) {
+                            Log.e(TAG, "onFailure: ");
                         }
                     }
-
-                    @Override
-                    public void onFailure(@NonNull Call<List<Ticker>> call, @NonNull Throwable t) {
-                        Log.e(TAG, "onFailure: ");
-                    }
-                }
-        );
+            );
+        }
 
     }
 
@@ -243,17 +161,20 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void searchForQuery(String query){
+    private void searchForQuery(final String query){
         service.getTickerCoin(query,
                 new Callback<List<Ticker>>() {
                     @Override
                     public void onResponse(@NonNull Call<List<Ticker>> call, @NonNull Response<List<Ticker>> response) {
                         try {
                             if (response.body() != null && response.body().size() > 0) {
-                                List<Ticker> list = (List<Ticker>) response.body();
+                                List<Ticker> list = response.body();
                                 if (list != null && list.size() > 0) {
-                                    dataSet.add(list.get(0));
-                                    adapter.notifyDataSetChanged();
+                                    Log.d(TAG, "onResponse: Response found for query");
+                                    coins.add(query);
+                                    ((MainActivityAdapter)adapter).addTicker(list.get(0));
+                                    recyclerView.smoothScrollToPosition(0);
+
                                 }
                             } else {
                                 CoordinatorLayout cl = findViewById(R.id.id_activity_main_coordinator_layout);
@@ -281,15 +202,21 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.id_one_hour_menu:
                 ((MainActivityAdapter)adapter).setChangeType(Utils.ONE_HOUR_CHANGE);
-                updateView(ONE_HOUR, new ArrayList<String>());
+                dataSet = new ArrayList<>();
+                adapter.notifyDataSetChanged();
+                updateView(ONE_HOUR, coins);
                 return true;
             case R.id.id_24_hours_menu:
                 ((MainActivityAdapter)adapter).setChangeType(Utils.TWENTY_FOUR_HOURS_CHANGE);
-                updateView(TWENTY_FOUR_HOURS, new ArrayList<String>());
+                dataSet = new ArrayList<>();
+                adapter.notifyDataSetChanged();
+                updateView(TWENTY_FOUR_HOURS, coins);
                 return true;
             case R.id.id_7_days_menu:
                 ((MainActivityAdapter)adapter).setChangeType(Utils.SEVEN_DAYS_CHANGE);
-                updateView(SEVEN_DAYS, new ArrayList<String>());
+                dataSet = new ArrayList<>();
+                adapter.notifyDataSetChanged();
+                updateView(SEVEN_DAYS, coins);
                 return true;
             case R.id.app_bar_search:
                 return true;

@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.List;
-import java.util.Map;
 
 import virtual_coin_checker.sincdor.coinchecker.R;
 import virtual_coin_checker.sincdor.coinchecker.models.Ticker;
@@ -84,5 +83,10 @@ public class MainActivityAdapter extends RecyclerView.Adapter<MainActivityAdapte
     @Override
     public int getItemCount() {
         return dataSet.size();
+    }
+
+    public void addTicker(Ticker t){
+        this.dataSet.add(0, t);
+        notifyItemInserted(0);
     }
 }
