@@ -22,6 +22,7 @@ public class Ticker {
     private String percent_change_24h;
     private String percent_change_7d;
     private String last_updated;
+    private double units_total;
 
     public Ticker(String id, String name, String symbol, String rank, String price_usd, String price_btc, String market_cap_usd, String available_supply, String total_supply, String max_supply, String percent_change_1h, String percent_change_24h, String percent_change_7d, String last_updated) {
         this.id = id;
@@ -153,5 +154,11 @@ public class Ticker {
     }
 
 
+    public double getUnits_total() {
+        return units_total;
+    }
 
+    public void setUnits_total(double units_total) {
+        this.units_total = units_total;
+    }
 }

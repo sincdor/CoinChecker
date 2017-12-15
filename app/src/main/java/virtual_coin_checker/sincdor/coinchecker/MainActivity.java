@@ -62,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
         coins.add("vertcoin");
         coins.add("bitcoin");
         coins.add("nxt");
+        coins.add("litecoin");
 
         service = new TickerRetroS();
 
@@ -75,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
         mLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(mLayoutManager);
 
-        adapter = new MainActivityAdapter(dataSet, Utils.TWENTY_FOUR_HOURS_CHANGE);
+        adapter = new MainActivityAdapter(dataSet, Utils.TWENTY_FOUR_HOURS_CHANGE, this);
         recyclerView.setAdapter(adapter);
 
         updateView(null, coins);
@@ -130,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
 
         sv = (SearchView) menu.findItem(R.id.app_bar_search).getActionView();
         sv.setSearchableInfo(
-                searchManager.getSearchableInfo(getComponentName()));
+                searchManager != null ? searchManager.getSearchableInfo(getComponentName()) : null);
         if(sv != null){
             sv.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                 @Override
@@ -157,7 +158,9 @@ public class MainActivity extends AppCompatActivity {
         View view = this.getCurrentFocus();
         if (view != null) {
             InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+            if (imm != null) {
+                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+            }
         }
     }
 
