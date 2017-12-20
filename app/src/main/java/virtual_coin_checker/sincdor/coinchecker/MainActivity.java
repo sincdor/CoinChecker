@@ -2,10 +2,14 @@ package virtual_coin_checker.sincdor.coinchecker;
 
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -17,11 +21,16 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -47,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
 
     SearchView sv;
 
-    ArrayList<String> coins;
+    Map<String, Double> coins;
 
 
     @Override
@@ -58,17 +67,17 @@ public class MainActivity extends AppCompatActivity {
         FirebaseMessaging.getInstance().subscribeToTopic("vertcoin");
         FirebaseMessaging.getInstance().subscribeToTopic("bitcoin");
 
-        coins = new ArrayList<>();
-        coins.add("vertcoin");
-        coins.add("bitcoin");
-        coins.add("nxt");
-        coins.add("litecoin");
+        coins = Utils.getCoinsList(this);
+
+        if(coins==null)
+            coins = new HashMap<>();
 
         service = new TickerRetroS();
 
         dataSet = new ArrayList<>();
 
         Toolbar toolbar = findViewById(R.id.toolbar_ALU);
+        toolbar.setTitleTextColor(getResources().getColor(R.color.colorWhite));
         setSupportActionBar(toolbar);
 
         recyclerView = findViewById(R.id.id_content_main_activity_recycler_view);
@@ -79,13 +88,91 @@ public class MainActivity extends AppCompatActivity {
         adapter = new MainActivityAdapter(dataSet, Utils.TWENTY_FOUR_HOURS_CHANGE, this);
         recyclerView.setAdapter(adapter);
 
-        updateView(null, coins);
+        FloatingActionButton fab = findViewById(R.id.id_fab);
+        fab.setOnClickListener(fabClickListener);
 
+        updateView(null, coins);
     }
 
-    private void updateView(String sHour, List<String>coins){
+    View.OnClickListener fabClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            addNewCoin();
+        }
+    };
 
-        for(String coin : coins) {
+    private void addNewCoin(){
+        final AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+        alertDialog.setTitle("New Coin");
+        alertDialog.setMessage("Here you can subscribe to a new coin!");
+        final TextView idcointv = new TextView(this);
+        idcointv.setText("Coin id");
+        final TextView unitstv = new TextView(this);
+        unitstv.setText("Coin units");
+        final EditText idcoin = new EditText(this);
+        final EditText units = new EditText(this);
+        LinearLayout linearLayout = new LinearLayout(this);
+        linearLayout.setOrientation(LinearLayout.VERTICAL);
+
+        linearLayout.addView(idcointv);
+        linearLayout.addView(idcoin);
+        linearLayout.addView(unitstv);
+        linearLayout.addView(units);
+
+        alertDialog.setView(linearLayout);
+
+        alertDialog.setPositiveButton("YES",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        String unitss = units.getText().toString();
+                        Double unit_d = 0.0;
+                        if(unitss.length() <= 0)
+                            unitss = "0.0";
+                        try{
+                            unit_d = Double.valueOf(unitss);
+                        }catch (ClassCastException e)
+                        {
+                            Log.e(TAG, "onClick: " + e);
+                        }
+                        final String coin = idcoin.getText().toString();
+                        final Double unitsD = unit_d;
+                        service.getTickerCoin(coin, new Callback<List<Ticker>>() {
+                            @Override
+                            public void onResponse(Call<List<Ticker>> call, Response<List<Ticker>> response) {
+                                if(response.body() != null){
+                                    List<Ticker> tickers = response.body();
+                                    if(tickers != null && tickers.size() > 0){
+                                        Utils.saveCoin(coin, unitsD, MainActivity.this);
+                                        tickers.get(0).setUnits_total(unitsD);
+                                        dataSet.add(tickers.get(0));
+                                        adapter.notifyDataSetChanged();
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<List<Ticker>> call, Throwable t) {
+                            }
+                        });
+                    }
+                });
+
+        alertDialog.setNegativeButton("NO",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+        alertDialog.show();
+    }
+
+    private void updateView(String sHour, Map<String, Double>coins){
+
+        if(coins==null)
+            return;
+        for(String coin : coins.keySet()) {
+            final Double value = coins.get(coin);
             service.getTickerCoin(coin,
                     new Callback<List<Ticker>>() {
                         @Override
@@ -96,8 +183,10 @@ public class MainActivity extends AppCompatActivity {
                                 try {
                                     if (response.body().size() > 0)
                                         t = response.body().get(0);
+
                                     if (t != null) {
                                         Log.d(TAG, "onResponse: Coin:" + t.getId() + " price:" + t.getPrice_usd());
+                                        t.setUnits_total(value);
                                         dataSet.add(t);
                                         if (adapter != null)
                                             adapter.notifyDataSetChanged();
@@ -174,7 +263,7 @@ public class MainActivity extends AppCompatActivity {
                                 List<Ticker> list = response.body();
                                 if (list != null && list.size() > 0) {
                                     Log.d(TAG, "onResponse: Response found for query");
-                                    coins.add(query);
+                                    coins.put(query, 0.0);
                                     ((MainActivityAdapter)adapter).addTicker(list.get(0));
                                     recyclerView.smoothScrollToPosition(0);
 

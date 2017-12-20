@@ -85,7 +85,7 @@ public class MainActivityAdapter extends RecyclerView.Adapter<MainActivityAdapte
     @Override
     public void onBindViewHolder(MainActivityAdapter.ViewHolder holder, final int position) {
         holder.tvCoin.setText(dataSet.get(position).getName());
-        holder.tvPrice.setText(dataSet.get(position).getPrice_usd());
+        holder.tvPrice.setText(dataSet.get(position).getPrice_usd() + "$");
         holder.tvDate.setText(Utils.getDateTime());
         if(changeType.equals(Utils.ONE_HOUR_CHANGE)) {
             holder.tvChange24_hours.setText(dataSet.get(position).getPercent_change_1h() + "%");
@@ -99,7 +99,7 @@ public class MainActivityAdapter extends RecyclerView.Adapter<MainActivityAdapte
         }
         if(dataSet.get(position).getUnits_total() > 0){
             Double estimatedValue = dataSet.get(position).getUnits_total() * Double.valueOf(dataSet.get(position).getPrice_usd());
-            holder.estimatedValue.setText(estimatedValue.toString());
+            holder.estimatedValue.setText(estimatedValue.toString()+"$");
         }else{
             holder.estimatedValue.setText("0.0");
         }
@@ -127,6 +127,8 @@ public class MainActivityAdapter extends RecyclerView.Adapter<MainActivityAdapte
                                 try{
                                     Double unit_d = Double.valueOf(units);
                                     dataSet.get(position).setUnits_total(unit_d);
+                                    Utils.changeUnits(dataSet.get(position).getId(), unit_d, context);
+                                    notifyDataSetChanged();
                                 }catch (ClassCastException e)
                                 {
                                     Log.e(TAG, "onClick: " + e);

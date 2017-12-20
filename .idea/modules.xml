@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/CoinChecker.iml" filepath="$PROJECT_DIR$/.idea/CoinChecker.iml" />
       <module fileurl="file://$PROJECT_DIR$/CoinChecker.iml" filepath="$PROJECT_DIR$/CoinChecker.iml" />
+      <module fileurl="file://C:\Users\Andre\StudioProjects\CoinChecker\.idea\CoinChecker.iml" filepath="C:\Users\Andre\StudioProjects\CoinChecker\.idea\CoinChecker.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>
