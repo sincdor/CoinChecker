@@ -89,17 +89,17 @@ public class MainActivityAdapter extends RecyclerView.Adapter<MainActivityAdapte
         holder.tvDate.setText(Utils.getDateTime());
         if(changeType.equals(Utils.ONE_HOUR_CHANGE)) {
             holder.tvChange24_hours.setText(dataSet.get(position).getPercent_change_1h() + "%");
-            holder.tvChangeFinal.setText("(Change in last hour)");
+            holder.tvChangeFinal.setText("Change in last hour");
         }else if(changeType.equals(Utils.TWENTY_FOUR_HOURS_CHANGE)) {
             holder.tvChange24_hours.setText(dataSet.get(position).getPercent_change_24h()+"%");
-            holder.tvChangeFinal.setText("(Change last 24 hours)");
+            holder.tvChangeFinal.setText("Change last 24 hours");
         }else if(changeType.equals(Utils.SEVEN_DAYS_CHANGE)) {
             holder.tvChange24_hours.setText(dataSet.get(position).getPercent_change_7d()+"%");
-            holder.tvChangeFinal.setText("(Change in last seven days)");
+            holder.tvChangeFinal.setText("Change in last seven days");
         }
         if(dataSet.get(position).getUnits_total() > 0){
             Double estimatedValue = dataSet.get(position).getUnits_total() * Double.valueOf(dataSet.get(position).getPrice_usd());
-            holder.estimatedValue.setText(estimatedValue.toString()+"$");
+            holder.estimatedValue.setText(estimatedValue.intValue()+"$");
         }else{
             holder.estimatedValue.setText("0.0");
         }

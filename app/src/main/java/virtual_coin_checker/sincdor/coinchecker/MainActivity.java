@@ -58,6 +58,8 @@ public class MainActivity extends AppCompatActivity {
 
     Map<String, Double> coins;
 
+    Toolbar toolbar;
+    Double estimatedValue = 0.0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
 
         dataSet = new ArrayList<>();
 
-        Toolbar toolbar = findViewById(R.id.toolbar_ALU);
+        toolbar = findViewById(R.id.toolbar_ALU);
         toolbar.setTitleTextColor(getResources().getColor(R.color.colorWhite));
         setSupportActionBar(toolbar);
 
@@ -188,6 +190,10 @@ public class MainActivity extends AppCompatActivity {
                                         Log.d(TAG, "onResponse: Coin:" + t.getId() + " price:" + t.getPrice_usd());
                                         t.setUnits_total(value);
                                         dataSet.add(t);
+
+                                        estimatedValue = estimatedValue + (t.getUnits_total() * Float.valueOf(t.getPrice_usd()));
+                                        toolbar.setTitle("Total Estimated: " + estimatedValue.intValue()+"$");
+
                                         if (adapter != null)
                                             adapter.notifyDataSetChanged();
                                     }
