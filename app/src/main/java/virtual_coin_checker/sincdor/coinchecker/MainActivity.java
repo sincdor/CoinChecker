@@ -68,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
 
         FirebaseMessaging.getInstance().subscribeToTopic("vertcoin");
         FirebaseMessaging.getInstance().subscribeToTopic("bitcoin");
+        FirebaseMessaging.getInstance().subscribeToTopic("all");
 
         coins = Utils.getCoinsList(this);
 
